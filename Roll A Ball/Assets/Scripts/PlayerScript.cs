@@ -4,24 +4,26 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class PlayerScript : MonoBehaviour {
-	
-	public float speed;
-	public Text countText;
-	public Text winText;
+	public GameObject RightExplosionPartical,WrongExplosionPartical;
+	public float speed; 
+	public Text score;
+	public GameObject completeLevelUI;
 	private Vector3 position;
 	private Rigidbody rb;
-	private int count;
+	private int count ,palindromesCount;
 	private bool canSpawnHere;
 	public Collider[] colliders;
-	float radius=2;
+	private float radius=2;
 	public Transform player;
+	private bool isPalindrome;
+
 	
 	void Start ()
 	{
 		rb = GetComponent<Rigidbody>(); 
 		count = 0;
-		SetCountText ();
-		winText.text = "";
+		palindromesCount=0;
+		objectCount ();
 
 	}
 	
@@ -39,15 +41,17 @@ public class PlayerScript : MonoBehaviour {
 		if (other.gameObject.CompareTag ("Pick Up"))
 		{
 			string str=other.transform.parent.gameObject.GetComponent<TextMesh>().text;
-			Debug.Log(str);
+			count = count + 1;
 			if(checkPalindrome(str))
 			{
-				//other.gameObject.SetActive (false);
-				Destroy(other.gameObject);
-				Destroy(other.transform.parent.gameObject);
-				count = count + 1;
-				SetCountText ();
+				isPalindrome=true;
+				palindromesCount=palindromesCount+1;
+				objectCount ();
 			}
+			Explode(other.gameObject.transform.position , isPalindrome); 
+			Destroy(other.gameObject);
+			Destroy(other.transform.parent.gameObject);
+
 		}else if (other.gameObject.CompareTag ("spinner"))
 		{
 			while(!canSpawnHere){
@@ -66,6 +70,15 @@ public class PlayerScript : MonoBehaviour {
 			}
 		}
 	}
+	void Explode (Vector3 Explosionposition , bool isPalindrome) {
+		if(isPalindrome){
+			GameObject firework = Instantiate(RightExplosionPartical, Explosionposition, Quaternion.identity);
+			firework.GetComponent<ParticleSystem>().Play();
+		}else{
+			GameObject firework = Instantiate(WrongExplosionPartical, Explosionposition, Quaternion.identity);
+			firework.GetComponent<ParticleSystem>().Play();
+		}
+	}
 	bool checkPalindrome(string str){ 
 			int l = str.Length;
 			for (int i = 0; i < l/2; i++) {
@@ -76,13 +89,16 @@ public class PlayerScript : MonoBehaviour {
 			return true;
 		 
 	}
-	void SetCountText ()
+	void objectCount ()
 	{
-		countText.text = "Count: " + count.ToString ();
-		if (count >= 8)
+		if (count >= 10)
 		{
-			winText.text = "You Win!";
+			CompleteLevel(); 
 		}
+	}
+	void CompleteLevel(){
+		score.text=palindromesCount+"";
+		completeLevelUI.SetActive(true);
 	}
 	bool checkSpawnPosition( Vector3 SpawnPos)
 	{
