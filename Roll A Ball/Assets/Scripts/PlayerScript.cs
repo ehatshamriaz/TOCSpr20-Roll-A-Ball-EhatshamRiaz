@@ -12,16 +12,17 @@ public class PlayerScript : MonoBehaviour {
 	private Rigidbody rb;
 	private int count ,palindromesCount;
 	private bool canSpawnHere;
-	public Collider[] colliders;
-	private float radius=2;
+	public Collider[] colliders; 
 	public Transform player;
 	private bool isPalindrome;
-
-	
+	private int cubeCount ;
+	public Text cubeCountText;
+	public AudioSource audioSource ,audioNo,audiospin,audioBridge;
 	void Start ()
 	{
 		rb = GetComponent<Rigidbody>(); 
 		count = 0;
+		cubeCount=10;
 		palindromesCount=0;
 		objectCount ();
 
@@ -36,27 +37,48 @@ public class PlayerScript : MonoBehaviour {
 		
 		rb.AddForce (movement * speed);
 	}
+	 
+
+	void Update () {
+		GameObject[] thingyToFind = GameObject.FindGameObjectsWithTag ("PickUp");
+		  cubeCount = thingyToFind.Length;
+		cubeCountText.text="Cubes Left: "+cubeCount;
+		objectCount();
+	}
+	void OnTriggerExit(Collider other) 
+	{
+		if(other.gameObject.CompareTag ("bridge"))
+		{
+			if (audioBridge.isPlaying)
+			{
+				audioBridge.Stop();
+			}
+		}
+	}
 	void OnTriggerEnter(Collider other) 
 	{
-		if (other.gameObject.CompareTag ("Pick Up"))
+		if (other.gameObject.CompareTag ("PickUp"))
 		{
+
 			string str=other.transform.parent.gameObject.GetComponent<TextMesh>().text;
-			count = count + 1;
+			other.transform.parent.gameObject.SetActive(false); 
 			if(checkPalindrome(str))
 			{
+				audioSource.Play();
 				isPalindrome=true;
 				palindromesCount=palindromesCount+1;
-				objectCount ();
+
+			}else{
+				isPalindrome=false;
+				audioNo.Play();
 			}
 			Explode(other.gameObject.transform.position , isPalindrome); 
-			Destroy(other.gameObject);
-			Destroy(other.transform.parent.gameObject);
-
+			objectCount();
+				 
 		}else if (other.gameObject.CompareTag ("spinner"))
 		{
 			while(!canSpawnHere){
-				  position = new Vector3(Random.Range(-22.0F, 22.0F), 0.5f, Random.Range(-22.0F, 22.0F));
-				
+				position = new Vector3(Random.Range(-22.0F, 22.0F), 0.5f, Random.Range(-22.0F, 22.0F));
 				canSpawnHere=checkSpawnPosition(position);
 				count++;
 				if(count==500)
@@ -65,9 +87,14 @@ public class PlayerScript : MonoBehaviour {
 				}
 			}
 			if(canSpawnHere){
+				audiospin.Play();
 				player.position=position;
 				canSpawnHere=false;
 			}
+		}
+		else if (other.gameObject.CompareTag ("bridge"))
+		{
+			audioBridge.Play();
 		}
 	}
 	void Explode (Vector3 Explosionposition , bool isPalindrome) {
@@ -79,7 +106,7 @@ public class PlayerScript : MonoBehaviour {
 			firework.GetComponent<ParticleSystem>().Play();
 		}
 	}
-	bool checkPalindrome(string str){ 
+	  bool checkPalindrome(string str){  
 			int l = str.Length;
 			for (int i = 0; i < l/2; i++) {
 				if (str[i] != str[l - 1 - i]) {
@@ -91,7 +118,7 @@ public class PlayerScript : MonoBehaviour {
 	}
 	void objectCount ()
 	{
-		if (count >= 10)
+		if (cubeCount == 0)
 		{
 			CompleteLevel(); 
 		}

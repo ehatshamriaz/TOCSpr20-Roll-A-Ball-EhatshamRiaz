@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5714175615228157095}
   - component: {fileID: 5714175615228157094}
   m_Layer: 0
-  m_Name: explosion
+  m_Name: Rightexplosion
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4767,8 +4767,8 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 21060047debaa344d8f661d8a87b7e35, type: 2}
-  - {fileID: 0}
+  - {fileID: 2100000, guid: 6b49ffba328f5ee4ba4471d214d8ad0d, type: 2}
+  - {fileID: 2100000, guid: 6b49ffba328f5ee4ba4471d214d8ad0d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

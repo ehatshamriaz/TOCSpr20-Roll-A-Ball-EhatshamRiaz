@@ -4,9 +4,11 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Pick Up
   - ground
   - spinner
+  - PickUp
+  - Pick Up
+  - bridge
   layers:
   - Default
   - TransparentFX
