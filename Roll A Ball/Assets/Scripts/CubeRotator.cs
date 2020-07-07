@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Rotator1 : MonoBehaviour {
+public class CubeRotator : MonoBehaviour {
 	
 	void Update () 
 	{
-		transform.Rotate (0f,10f,0f); 
+		transform.Rotate (new Vector3 (15, 30, 45) * Time.deltaTime); 
 	}
 }

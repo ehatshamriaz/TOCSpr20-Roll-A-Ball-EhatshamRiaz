@@ -2,24 +2,29 @@
 using System.Collections.Generic;
 using UnityEngine; 
 using UnityEngine.UI;
+using roll_a_ball_helper;
 
 public class PlayerScript : MonoBehaviour {
+    HelperClass HPclass = new HelperClass();
+	
+	public Transform player;
+	public float speed;
 	public GameObject RightExplosionPartical,WrongExplosionPartical;
-	public float speed; 
+	public Text cubeCountText;
 	public Text score;
 	public GameObject completeLevelUI;
+	public AudioSource audioSource ,audioNo,audiospin,audioBridge;
+
 	private Vector3 position;
 	private Rigidbody rb;
 	private int count ,palindromesCount;
-	private bool canSpawnHere;
-	public Collider[] colliders; 
-	public Transform player;
+	private bool canSpawnHere; 
 	private bool isPalindrome;
 	private int cubeCount ;
-	public Text cubeCountText;
-	public AudioSource audioSource ,audioNo,audiospin,audioBridge;
+   
 	void Start ()
-	{
+    {
+        
 		rb = GetComponent<Rigidbody>(); 
 		count = 0;
 		cubeCount=10;
@@ -27,18 +32,15 @@ public class PlayerScript : MonoBehaviour {
 		objectCount ();
 
 	}
-	
 	void FixedUpdate ()
 	{
 		float moveHorizontal = Input.GetAxis ("Horizontal");
 		float moveVertical = Input.GetAxis ("Vertical");
-		
+
 		Vector3 movement = new Vector3 (moveHorizontal, 0.0f, moveVertical);
 		
 		rb.AddForce (movement * speed);
 	}
-	 
-
 	void Update () {
 		GameObject[] thingyToFind = GameObject.FindGameObjectsWithTag ("PickUp");
 		  cubeCount = thingyToFind.Length;
@@ -61,8 +63,8 @@ public class PlayerScript : MonoBehaviour {
 		{
 
 			string str=other.transform.parent.gameObject.GetComponent<TextMesh>().text;
-			other.transform.parent.gameObject.SetActive(false); 
-			if(checkPalindrome(str))
+			other.transform.parent.gameObject.SetActive(false);
+            if (HPclass.checkPalindrome(str))
 			{
 				audioSource.Play();
 				isPalindrome=true;
@@ -79,7 +81,7 @@ public class PlayerScript : MonoBehaviour {
 		{
 			while(!canSpawnHere){
 				position = new Vector3(Random.Range(-22.0F, 22.0F), 0.5f, Random.Range(-22.0F, 22.0F));
-				canSpawnHere=checkSpawnPosition(position);
+                canSpawnHere = HPclass.checkSpawnPosition(position);
 				count++;
 				if(count==500)
 				{Debug.Log("break");
@@ -106,49 +108,13 @@ public class PlayerScript : MonoBehaviour {
 			firework.GetComponent<ParticleSystem>().Play();
 		}
 	}
-	  bool checkPalindrome(string str){  
-			int l = str.Length;
-			for (int i = 0; i < l/2; i++) {
-				if (str[i] != str[l - 1 - i]) {
-					return false;
-				}
-			}
-			return true;
-		 
-	}
 	void objectCount ()
 	{
 		if (cubeCount == 0)
 		{
-			CompleteLevel(); 
+			score.text=palindromesCount+"";
+			completeLevelUI.SetActive(true); 
 		}
 	}
-	void CompleteLevel(){
-		score.text=palindromesCount+"";
-		completeLevelUI.SetActive(true);
-	}
-	bool checkSpawnPosition( Vector3 SpawnPos)
-	{
-		colliders= Physics.OverlapSphere(position,1);
-		for(int i=0; i<colliders.Length;i++){
-			if(colliders[i].tag=="ground"){
-				continue;
-			}
-			Vector3 centerPoint=colliders[i].bounds.center;
-			float width = colliders[i].bounds.extents.x;
-			float height= colliders[i].bounds.extents.z;
-			
-			float leftExtent=(centerPoint.x - width)-5;
-			float rightExtent=(centerPoint.x + width)+5;
-			float upExtent=(centerPoint.z - height)-5;
-			float downExtent=(centerPoint.z + height)+5;
-			if(SpawnPos.x >= leftExtent && SpawnPos.x <= rightExtent){
-				if(SpawnPos.z >= upExtent && SpawnPos.z <= downExtent){
-					return false;
-				}
-			}
-			
-		}
-		return true;
-	}
-}
+	 
+ }
